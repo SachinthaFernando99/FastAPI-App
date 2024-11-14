@@ -3,6 +3,7 @@ from models import UserRole
 from database import SessionLocal
 from sqlalchemy.orm import Session
 from typing import Optional
+from sqlalchemy.exc import IntegrityError
 
 router = APIRouter()
 
@@ -56,10 +57,22 @@ def update_user_role(type_id: int, usertype: Optional[str] = None, db: Session =
 @router.delete("/delete-user-role/{type_id}")
 def delete_user_role(type_id: int, db: Session = Depends(get_db)):
     user_role = db.query(UserRole).filter(UserRole.type_id == type_id).first()
-    if not user_role:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid roleid: No such role exists")
-    db.delete(user_role)
-    db.commit()
-    return {"Message": "User Role Deleted Successfully"}
 
+    if not user_role:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid role ID: No such role exists"
+        )
+
+    try:
+        db.delete(user_role)
+        db.commit()
+        return {"Message": "User Role Deleted Successfully"}
+
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete role. It is referenced by other records."
+        )
 
