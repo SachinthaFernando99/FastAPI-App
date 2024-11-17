@@ -20,6 +20,14 @@ def read_user_roles(db: Session = Depends(get_db)):
     role_list = [{"typeid":r.type_id,"rolename": r.role_name} for r in user_role]
     return role_list
 
+@router.get("/user_roles/{role_name}")
+def read_user_roles(role_name:str,db: Session = Depends(get_db)):
+    user_role = db.query(UserRole).filter(UserRole.role_name==role_name).first()
+    if not user_role:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid roleid: No such role exists")
+    role_dict = {"typeid": user_role.type_id, "rolename": user_role.role_name}
+    return role_dict
+
 @router.post("/create-user-roles")
 def create_user_roles(role_name: str, db: Session = Depends(get_db)):
     db_user_role = UserRole(role_name=role_name)
