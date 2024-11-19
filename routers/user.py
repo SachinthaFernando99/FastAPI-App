@@ -20,6 +20,33 @@ def read_user(db: Session = Depends(get_db)):
     user_list = [{"userid":u.user_id,"firstname": u.first_name, "lastname": u.last_name, "rolename": u.role_name} for u in user]
     return user_list
 
+@router.get("/filter_user_details")
+def filter_user_details(
+    first_name: Optional[str] = None,
+    last_name: Optional[str] = None,
+    role_name: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+  
+    if not any([first_name, last_name, role_name]):
+        raise HTTPException(status_code=400, detail="At least one filter field (first_name, last_name, or role_name) must be provided.")
+
+    user_list = db.query(User.first_name, User.last_name, UserRole.role_name).join(UserRole, User.role_id == UserRole.type_id)
+
+    if first_name:
+        user_list = user_list.filter(User.first_name.ilike(f"%{first_name}%"))
+    if last_name:
+        user_list = user_list.filter(User.last_name.ilike(f"%{last_name}%"))
+    if role_name:
+        user_list = user_list.filter(UserRole.role_name.ilike(f"%{role_name}%"))
+
+    results = user_list.all()  
+
+    if not results:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No User to be found")
+
+    results_list = [{"first_name": r[0], "last_name": r[1], "role_name": r[2]} for r in results]
+    return results_list
 
 
 @router.post("/create-user")

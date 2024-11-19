@@ -20,6 +20,8 @@ def read_user_roles(db: Session = Depends(get_db)):
     role_list = [{"typeid":r.type_id,"rolename": r.role_name} for r in user_role]
     return role_list
 
+
+
 @router.get("/user_roles/{role_name}")
 def read_user_roles(role_name:str,db: Session = Depends(get_db)):
     user_role = db.query(UserRole).filter(UserRole.role_name==role_name).first()
