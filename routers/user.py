@@ -13,10 +13,11 @@ def get_db():
     finally:
         db.close()
 
+
 @router.get("/user")
 def read_user(db: Session = Depends(get_db)):
-    user = db.query(User.first_name, User.last_name, UserRole.role_name).join(UserRole, User.role_id == UserRole.type_id).all()
-    user_list = [{"firstname": u.first_name, "lastname": u.last_name, "rolename": u.role_name} for u in user]
+    user = db.query(User.user_id,User.first_name, User.last_name, UserRole.role_name).join(UserRole, User.role_id == UserRole.type_id).all()
+    user_list = [{"userid":u.user_id,"firstname": u.first_name, "lastname": u.last_name, "rolename": u.role_name} for u in user]
     return user_list
 
 
