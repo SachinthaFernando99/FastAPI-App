@@ -20,6 +20,13 @@ def read_user(db: Session = Depends(get_db)):
     user_list = [{"userid":u.user_id,"firstname": u.first_name, "lastname": u.last_name, "rolename": u.role_name} for u in user]
     return user_list
 
+@router.get("/user_count")
+def read_user(db: Session = Depends(get_db)):
+    user = db.query(User.user_id,User.first_name, User.last_name, UserRole.role_name).join(UserRole, User.role_id == UserRole.type_id).all()
+    user_list = [{"userid":u.user_id,"firstname": u.first_name, "lastname": u.last_name, "rolename": u.role_name} for u in user]
+    user_count=len(user_list)
+    return user_count
+
 @router.get("/filter_user_details")
 def filter_user_details(
     first_name: Optional[str] = None,
@@ -29,7 +36,7 @@ def filter_user_details(
 ):
   
     if not any([first_name, last_name, role_name]):
-        raise HTTPException(status_code=400, detail="At least one filter field (first_name, last_name, or role_name) must be provided.")
+        raise HTTPException(status_code=400, detail="At least one filter field (firstname, lastname, or rolename) must be provided.")
 
     user_list = db.query(User.first_name, User.last_name, UserRole.role_name).join(UserRole, User.role_id == UserRole.type_id)
 
@@ -45,7 +52,7 @@ def filter_user_details(
     if not results:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No User to be found")
 
-    results_list = [{"first_name": r[0], "last_name": r[1], "role_name": r[2]} for r in results]
+    results_list = [{"firstname": r[0], "lastname": r[1], "rolename": r[2]} for r in results]
     return results_list
 
 

@@ -20,6 +20,13 @@ def read_user_roles(db: Session = Depends(get_db)):
     role_list = [{"typeid":r.type_id,"rolename": r.role_name} for r in user_role]
     return role_list
 
+@router.get("/user_roles_count")
+def read_user_roles(db: Session = Depends(get_db)):
+    user_role = db.query(UserRole.type_id,UserRole.role_name).all()
+    role_list = [{"typeid":r.type_id,"rolename": r.role_name} for r in user_role]
+    user_role_count = len(role_list)
+    return user_role_count
+
 
 
 @router.get("/user_roles/{role_name}")
