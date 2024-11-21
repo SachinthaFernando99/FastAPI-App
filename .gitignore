@@ -1,0 +1,40 @@
+# Python-related
+*.pyc
+*.pyo
+__pycache__/
+*.pyd
+*.so
+*.egg
+*.eggs
+dist/
+build/
+*.tgz
+*.tar.gz
+
+# Virtual environment
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# FastAPI-related
+*.sqlite3
+*.db
+
+# IDE related
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Python bytecode files
+*.py[cod]
+
+
+
